@@ -1,0 +1,25 @@
+export const PALETTE = {
+  panelBg: '#0d0b08',
+  dialBg: '#0e0c0a',
+  dialBgOuter: '#06050a',
+  cream: '#d4c8a8',
+  creamDim: '#8a8068',
+  creamFaint: '#4a4438',
+  needle: '#f5c63a',
+  needleEdge: '#caa427',
+  needleShadow: 'rgba(0,0,0,0.55)',
+  bezel: '#1f1b15',
+  bezelEdge: '#3a3328',
+  hub: '#1a1610',
+  hubRing: '#3a3328',
+  lcdBg: '#1a1c10',
+  lcdBgEdge: '#0c0d07',
+  lcdDigit: '#e6d39a',
+  lcdDigitDim: 'rgba(230,211,154,0.18)',
+  caution: '#f5c63a',
+  late: '#ff4d4d',
+  ahead: '#5fd47a',
+  onpace: '#f5c63a',
+} as const;
+
+export type PaletteColor = (typeof PALETTE)[keyof typeof PALETTE];
