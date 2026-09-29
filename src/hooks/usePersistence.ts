@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react';
 
 const KEY = 'rally-compass.v1';
 
+export type Role = 'driver' | 'codriver';
+export type Theme = 'dark' | 'light';
+
 export type Settings = {
   targetKmh: number;
   toleranceSec: number;
-  audioAlerts: boolean;
-  vibrateAlerts: boolean;
+  role: Role;
+  theme: Theme;
 };
 
 const DEFAULTS: Settings = {
   targetKmh: 50,
   toleranceSec: 1.5,
-  audioAlerts: true,
-  vibrateAlerts: true,
+  role: 'driver',
+  theme: 'dark',
 };
 
 function load(): Settings {
@@ -31,12 +34,8 @@ function load(): Settings {
         typeof parsed.toleranceSec === 'number' && parsed.toleranceSec > 0
           ? parsed.toleranceSec
           : DEFAULTS.toleranceSec,
-      audioAlerts:
-        typeof parsed.audioAlerts === 'boolean' ? parsed.audioAlerts : DEFAULTS.audioAlerts,
-      vibrateAlerts:
-        typeof parsed.vibrateAlerts === 'boolean'
-          ? parsed.vibrateAlerts
-          : DEFAULTS.vibrateAlerts,
+      role: parsed.role === 'driver' || parsed.role === 'codriver' ? parsed.role : DEFAULTS.role,
+      theme: parsed.theme === 'dark' || parsed.theme === 'light' ? parsed.theme : DEFAULTS.theme,
     };
   } catch {
     return DEFAULTS;

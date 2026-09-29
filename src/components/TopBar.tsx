@@ -1,13 +1,15 @@
+import type { Theme } from '../hooks/usePersistence';
 import { PALETTE } from '../lib/palette';
 import { GPSBars } from './GPSBars';
 
 type Props = {
   targetSpeed: number;
   gpsBars: number;
-  paused?: boolean;
+  theme: Theme;
+  onToggleTheme: () => void;
 };
 
-export function TopBar({ targetSpeed, gpsBars, paused }: Props) {
+export function TopBar({ targetSpeed, gpsBars, theme, onToggleTheme }: Props) {
   return (
     <div
       style={{
@@ -20,7 +22,7 @@ export function TopBar({ targetSpeed, gpsBars, paused }: Props) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 22px',
-        borderBottom: '1px solid rgba(212,200,168,0.08)',
+        borderBottom: `1px solid ${PALETTE.lineFaint}`,
         boxSizing: 'border-box',
       }}
     >
@@ -62,21 +64,7 @@ export function TopBar({ targetSpeed, gpsBars, paused }: Props) {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {paused && (
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: 1.4,
-              color: PALETTE.late,
-              padding: '3px 6px',
-              border: `1px solid ${PALETTE.late}`,
-              borderRadius: 1,
-              fontFamily: "'Barlow Condensed', sans-serif",
-            }}
-          >
-            PAUSED
-          </div>
-        )}
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         <div
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -91,5 +79,30 @@ export function TopBar({ targetSpeed, gpsBars, paused }: Props) {
         <GPSBars bars={gpsBars} total={5} size={14} />
       </div>
     </div>
+  );
+}
+
+function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      style={{
+        width: 36,
+        height: 30,
+        marginRight: 4,
+        background: 'transparent',
+        border: `1px solid ${PALETTE.line}`,
+        borderRadius: 2,
+        color: PALETTE.cream,
+        fontSize: 16,
+        lineHeight: 1,
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'manipulation',
+      }}
+    >
+      {theme === 'dark' ? '☀' : '☾'}
+    </button>
   );
 }

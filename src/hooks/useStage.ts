@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGPSTracking } from './useGPSTracking';
 
-type StageStatus = 'idle' | 'running' | 'paused';
+type StageStatus = 'idle' | 'running';
 
 export type PanelDerived = {
   distanceM: number;
@@ -20,11 +20,11 @@ export type StageDerived = {
 
 export type StageController = {
   status: StageStatus;
-  start: () => void;
-  pause: () => void;
-  resume: () => void;
-  reset: () => void;
+  /** Start (or restart) the stage clock. Returns the START epoch ms. */
+  start: () => number;
   exit: () => void;
+  /** Stage clock right now, in seconds. */
+  elapsedNow: () => number;
 };
 
 function deriveTrack(
@@ -53,77 +53,48 @@ function deriveTrack(
 
 export function useStage(targetKmh: number) {
   const [status, setStatus] = useState<StageStatus>('idle');
-  const startedAt = useRef<number | null>(null);
-  const pauseStartedAt = useRef<number | null>(null);
-  const pausedDurationMs = useRef(0);
-  const [, force] = useState(0);
-  const tick = useCallback(() => force((n) => (n + 1) % 1_000_000), []);
+  // Ref for event handlers (exact time of a tap), state for rendering.
+  const startedAtRef = useRef<number | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
 
-  const gps = useGPSTracking({ active: status === 'running' || status === 'paused' });
+  const gps = useGPSTracking({ active: status === 'running' });
 
   useEffect(() => {
     if (status !== 'running') return;
     let raf: number;
     const loop = () => {
-      tick();
+      setNow(Date.now());
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [status, tick]);
-
-  // Sync GPS pause state with stage status
-  useEffect(() => {
-    gps.setPaused(status === 'paused');
-  }, [gps, status]);
+  }, [status]);
 
   const start = useCallback(() => {
-    startedAt.current = Date.now();
-    pauseStartedAt.current = null;
-    pausedDurationMs.current = 0;
+    const t = Date.now();
+    startedAtRef.current = t;
+    setStartedAt(t);
+    setNow(t);
     gps.reset();
     setStatus('running');
-  }, [gps]);
-
-  const pause = useCallback(() => {
-    if (status !== 'running') return;
-    pauseStartedAt.current = Date.now();
-    setStatus('paused');
-  }, [status]);
-
-  const resume = useCallback(() => {
-    if (status !== 'paused') return;
-    if (pauseStartedAt.current != null) {
-      pausedDurationMs.current += Date.now() - pauseStartedAt.current;
-      pauseStartedAt.current = null;
-    }
-    setStatus('running');
-  }, [status]);
-
-  const reset = useCallback(() => {
-    startedAt.current = Date.now();
-    pauseStartedAt.current = null;
-    pausedDurationMs.current = 0;
-    gps.reset();
-    setStatus('running');
+    return t;
   }, [gps]);
 
   const exit = useCallback(() => {
-    startedAt.current = null;
-    pauseStartedAt.current = null;
-    pausedDurationMs.current = 0;
+    startedAtRef.current = null;
+    setStartedAt(null);
     gps.reset();
     setStatus('idle');
   }, [gps]);
 
-  let elapsedSec = 0;
-  if (startedAt.current != null) {
-    const now =
-      status === 'paused' && pauseStartedAt.current != null
-        ? pauseStartedAt.current
-        : Date.now();
-    elapsedSec = Math.max(0, (now - startedAt.current - pausedDurationMs.current) / 1000);
-  }
+  const elapsedNow = useCallback(
+    () =>
+      startedAtRef.current == null ? 0 : Math.max(0, (Date.now() - startedAtRef.current) / 1000),
+    [],
+  );
+
+  const elapsedSec = startedAt == null ? 0 : Math.max(0, (now - startedAt) / 1000);
 
   const derived: StageDerived = {
     elapsedSec,
@@ -134,10 +105,8 @@ export function useStage(targetKmh: number) {
   const controller: StageController = {
     status,
     start,
-    pause,
-    resume,
-    reset,
     exit,
+    elapsedNow,
   };
 
   return { gps, derived, controller };

@@ -79,9 +79,9 @@ export function Dial({
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
       <defs>
         <radialGradient id={`dialFace-${uid}`} cx="50%" cy="45%" r="65%">
-          <stop offset="0%" stopColor="#181410" />
-          <stop offset="60%" stopColor="#0c0a07" />
-          <stop offset="100%" stopColor="#050403" />
+          <stop offset="0%" stopColor={PALETTE.dialFace1} />
+          <stop offset="60%" stopColor={PALETTE.dialFace2} />
+          <stop offset="100%" stopColor={PALETTE.dialFace3} />
         </radialGradient>
         <filter id={`needleShadow-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" />
@@ -97,8 +97,8 @@ export function Dial({
       </defs>
 
       <circle cx={cx} cy={cy} r={r} fill={`url(#dialFace-${uid})`} />
-      <circle cx={cx} cy={cy} r={r - 0.5} fill="none" stroke="#2a2419" strokeWidth="1" />
-      <circle cx={cx} cy={cy} r={r - 4} fill="none" stroke="#1a1610" strokeWidth="1" />
+      <circle cx={cx} cy={cy} r={r - 0.5} fill="none" stroke={PALETTE.dialRing} strokeWidth="1" />
+      <circle cx={cx} cy={cy} r={r - 4} fill="none" stroke={PALETTE.dialRingInner} strokeWidth="1" />
 
       {faceVariant === 'concentric' && (
         <circle
@@ -106,7 +106,7 @@ export function Dial({
           cy={cy}
           r={r - 18}
           fill="none"
-          stroke="rgba(212,200,168,0.04)"
+          stroke={PALETTE.lineFaint}
           strokeWidth="0.6"
         />
       )}
@@ -179,7 +179,7 @@ export function Dial({
         stroke={PALETTE.hubRing}
         strokeWidth="1"
       />
-      <circle cx={cx} cy={cy} r={size * 0.025} fill="#0a0806" />
+      <circle cx={cx} cy={cy} r={size * 0.025} fill={PALETTE.dialPin} />
 
       <g
         transform={`rotate(${needleAngle + 90} ${cx} ${cy})`}
@@ -207,7 +207,7 @@ export function Dial({
         />
       </g>
 
-      <circle cx={cx} cy={cy} r={size * 0.022} fill="#0c0a08" />
+      <circle cx={cx} cy={cy} r={size * 0.022} fill={PALETTE.dialPin} />
     </svg>
   );
 }

@@ -13,8 +13,109 @@
 @import '@fontsource/jetbrains-mono/500.css';
 @import '@fontsource/jetbrains-mono/700.css';
 
-:root {
+:root,
+:root[data-theme='dark'] {
   color-scheme: dark;
+  --c-body-bg: #0d0b08;
+  --c-body-text: #e8dcc4;
+  --c-app-bg: radial-gradient(120% 80% at 50% -10%, #1a1612 0%, #0d0b08 55%, #08070a 100%);
+  --c-panel-bg: #0d0b08;
+  --c-dial-bg: #0e0c0a;
+  --c-dial-bg-outer: #06050a;
+  --c-dial-face-1: #181410;
+  --c-dial-face-2: #0c0a07;
+  --c-dial-face-3: #050403;
+  --c-dial-ring: #2a2419;
+  --c-dial-ring-inner: #1a1610;
+  --c-dial-pin: #0a0806;
+  --c-cream: #d4c8a8;
+  --c-cream-dim: #8a8068;
+  --c-cream-faint: #4a4438;
+  --c-needle: #f5c63a;
+  --c-needle-edge: #caa427;
+  --c-needle-shadow: rgba(0, 0, 0, 0.55);
+  --c-bezel: #1f1b15;
+  --c-bezel-edge: #3a3328;
+  --c-hub: #1a1610;
+  --c-hub-ring: #3a3328;
+  --c-lcd-bg: #1a1c10;
+  --c-lcd-bg-edge: #0c0d07;
+  --c-lcd-bg-bottom: #0d0e08;
+  --c-lcd-border: #2a2a18;
+  --c-lcd-digit: #e6d39a;
+  --c-lcd-digit-dim: rgba(230, 211, 154, 0.18);
+  --c-track-bg-top: #181410;
+  --c-track-bg-bottom: #0c0a07;
+  --c-track-border: #2a2419;
+  --c-line-faint: rgba(212, 200, 168, 0.08);
+  --c-line: rgba(212, 200, 168, 0.18);
+  --c-line-strong: rgba(212, 200, 168, 0.25);
+  --c-overlay-bg: rgba(13, 11, 8, 0.92);
+  --c-cta-top: #2a1f0c;
+  --c-cta-bottom: #1a1408;
+  --c-caution: #f5c63a;
+  --c-late: #ff4d4d;
+  --c-ahead: #5fd47a;
+  --c-onpace: #f5c63a;
+  /* Full-screen pace colors: dark, saturated tints so they don't dazzle at night */
+  --c-pace-ok: #0f5a22;
+  --c-pace-ahead: #7a1010;
+  --c-pace-late: #4b1680;
+  --c-text-ahead: #ff5c5c;
+  --c-text-late: #c08cff;
+  --pace-base-opacity: 0.55;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --c-body-bg: #ffffff;
+  --c-body-text: #000000;
+  --c-app-bg: #ffffff;
+  --c-panel-bg: #ffffff;
+  --c-dial-bg: #fafafa;
+  --c-dial-bg-outer: #e8e8e8;
+  --c-dial-face-1: #ffffff;
+  --c-dial-face-2: #f4f4f4;
+  --c-dial-face-3: #e6e6e6;
+  --c-dial-ring: #000000;
+  --c-dial-ring-inner: #9a9a9a;
+  --c-dial-pin: #000000;
+  --c-cream: #000000;
+  --c-cream-dim: #2e2e2e;
+  --c-cream-faint: #666666;
+  --c-needle: #a34f00;
+  --c-needle-edge: #7a3b00;
+  --c-needle-shadow: rgba(0, 0, 0, 0.3);
+  --c-bezel: #ffe9b8;
+  --c-bezel-edge: #7a3b00;
+  --c-hub: #d8d8d8;
+  --c-hub-ring: #000000;
+  --c-lcd-bg: #eef1dc;
+  --c-lcd-bg-edge: #dde2c4;
+  --c-lcd-bg-bottom: #e4e8cc;
+  --c-lcd-border: #000000;
+  --c-lcd-digit: #000000;
+  --c-lcd-digit-dim: rgba(0, 0, 0, 0.06);
+  --c-track-bg-top: #f2f2f2;
+  --c-track-bg-bottom: #e2e2e2;
+  --c-track-border: #000000;
+  --c-line-faint: rgba(0, 0, 0, 0.2);
+  --c-line: rgba(0, 0, 0, 0.45);
+  --c-line-strong: rgba(0, 0, 0, 0.7);
+  --c-overlay-bg: rgba(255, 255, 255, 0.95);
+  --c-cta-top: #ffe9b8;
+  --c-cta-bottom: #ffd57a;
+  --c-caution: #e0a000;
+  --c-late: #c40000;
+  --c-ahead: #00751c;
+  --c-onpace: #8a5a00;
+  /* Full, bright colors — black numbers on top stay readable in direct sun */
+  --c-pace-ok: #1fd65a;
+  --c-pace-ahead: #ff3030;
+  --c-pace-late: #b566ff;
+  --c-text-ahead: #c40000;
+  --c-text-late: #6a1fb3;
+  --pace-base-opacity: 0.85;
 }
 
 * {
@@ -25,8 +126,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #0d0b08;
-  color: #e8dcc4;
+  background: var(--c-body-bg);
+  color: var(--c-body-text);
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -52,8 +153,8 @@ button {
 .app-root {
   width: 100%;
   height: 100%;
-  background: radial-gradient(120% 80% at 50% -10%, #1a1612 0%, #0d0b08 55%, #08070a 100%);
-  color: #e8dcc4;
+  background: var(--c-app-bg);
+  color: var(--c-body-text);
   font-family: 'Barlow Condensed', sans-serif;
   position: relative;
   overflow: hidden;
@@ -63,3 +164,39 @@ button {
   padding-right: env(safe-area-inset-right);
 }
 
+
+@keyframes pace-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.pace-blink {
+  animation: pace-blink 0.5s steps(2, jump-none) infinite;
+}
+
+.scroll-y {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+@keyframes mark-flash {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.mark-flash {
+  animation: mark-flash 400ms ease-out forwards;
+  pointer-events: none;
+}

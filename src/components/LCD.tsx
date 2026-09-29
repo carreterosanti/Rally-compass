@@ -30,9 +30,9 @@ export function LCD({
         position: 'relative',
         width,
         height,
-        background: `linear-gradient(180deg, ${PALETTE.lcdBgEdge} 0%, ${PALETTE.lcdBg} 50%, #0d0e08 100%)`,
-        border: '1px solid #2a2a18',
-        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(212,200,168,0.04)',
+        background: `linear-gradient(180deg, ${PALETTE.lcdBgEdge} 0%, ${PALETTE.lcdBg} 50%, ${PALETTE.lcdBgBottom} 100%)`,
+        border: `1px solid ${PALETTE.lcdBorder}`,
+        boxShadow: `inset 0 2px 4px ${PALETTE.needleShadow}, inset 0 -1px 0 ${PALETTE.lineFaint}`,
         borderRadius: 2,
         display: 'flex',
         flexDirection: 'column',
@@ -69,7 +69,7 @@ export function LCD({
           color: PALETTE.lcdDigit,
           letterSpacing: 1,
           lineHeight: 1,
-          textShadow: '0 0 6px rgba(230,211,154,0.18)',
+          textShadow: `0 0 6px ${PALETTE.lcdDigitDim}`,
         }}
       >
         {ghost && (

@@ -1,22 +1,25 @@
-import { useEffect } from 'react';
-import { useAlerts } from '../hooks/useAlerts';
 import type { GPSState } from '../hooks/useGPSTracking';
-import type { StageController, StageDerived } from '../hooks/useStage';
+import type { Theme } from '../hooks/usePersistence';
+import type { StageDerived } from '../hooks/useStage';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { PALETTE } from '../lib/palette';
+import { paceMessage, paceState } from '../lib/rallyLog';
 import { BottomControls } from './BottomControls';
 import { DriverPanel } from './DriverPanel';
+import { GpsOverlays } from './GpsOverlays';
+import { PaceOverlay } from './PaceOverlay';
 import { StatusBar } from './StatusBar';
 import { TopBar } from './TopBar';
 
 type Props = {
   targetKmh: number;
   tolerance: number;
-  audioAlerts: boolean;
-  vibrateAlerts: boolean;
+  theme: Theme;
+  onToggleTheme: () => void;
   gps: GPSState;
   derived: StageDerived;
-  controller: StageController;
+  onReset: () => void;
+  onExit: () => void;
 };
 
 const SIGNAL_LABELS: Record<GPSState['signalQuality'], string> = {
@@ -33,43 +36,32 @@ const SIGNAL_COLORS: Record<GPSState['signalQuality'], string> = {
   lost: PALETTE.late,
 };
 
+/** Driver view: raw + fused panels over a full-screen pace color. */
 export function DrivingScreen({
   targetKmh,
   tolerance,
-  audioAlerts,
-  vibrateAlerts,
+  theme,
+  onToggleTheme,
   gps,
   derived,
-  controller,
+  onReset,
+  onExit,
 }: Props) {
-  const fusedDelta = derived.fused.delta;
-  const paused = controller.status === 'paused';
+  useWakeLock(true);
 
-  useWakeLock(controller.status === 'running');
-  useAlerts({
-    delta: fusedDelta,
-    tolerance,
-    enabled: audioAlerts,
-    vibrate: vibrateAlerts,
-    active: controller.status === 'running',
-  });
-
-  useEffect(() => {
-    if (controller.status === 'idle') {
-      controller.start();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const showAcquiring =
-    !gps.hasFirstFix && (gps.status === 'requesting' || gps.status === 'active');
-  const showError =
-    gps.status === 'denied' || gps.status === 'unavailable' || gps.status === 'error';
+  const pace = paceState(derived.fused.delta, tolerance);
+  const showPace = gps.hasFirstFix;
 
   return (
     <div className="app-root">
+      {showPace && <PaceOverlay pace={pace} />}
       <StatusBar />
-      <TopBar targetSpeed={targetKmh} gpsBars={gps.gpsBars} paused={paused} />
+      <TopBar
+        targetSpeed={targetKmh}
+        gpsBars={gps.gpsBars}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
 
       <div
         style={{
@@ -90,13 +82,14 @@ export function DrivingScreen({
             derived={derived.raw}
             tolerance={tolerance}
             compact
+            neutral={showPace}
           />
         </div>
 
         <div
           style={{
             height: 1,
-            background: 'rgba(212,200,168,0.10)',
+            background: PALETTE.lineFaint,
             margin: '0 18px',
             position: 'relative',
           }}
@@ -108,10 +101,11 @@ export function DrivingScreen({
               top: -10,
               transform: 'translateX(-50%)',
               padding: '2px 10px',
-              background: '#0d0b08',
+              background: showPace ? 'transparent' : PALETTE.panelBg,
               fontFamily: "'Barlow Condensed', sans-serif",
               fontSize: 10,
               letterSpacing: 2,
+              whiteSpace: 'nowrap',
               color: gps.divergenceAlert ? PALETTE.late : PALETTE.creamFaint,
             }}
           >
@@ -139,67 +133,14 @@ export function DrivingScreen({
             derived={derived.fused}
             tolerance={tolerance}
             compact
+            neutral={showPace}
+            statusLabel={showPace ? paceMessage(pace) ?? undefined : undefined}
           />
         </div>
       </div>
 
-      <BottomControls
-        paused={paused}
-        onToggle={() => (paused ? controller.resume() : controller.pause())}
-        onReset={controller.reset}
-        onExit={controller.exit}
-      />
-
-      {showAcquiring && (
-        <Overlay title="ACQUIRING GPS…" subtitle="Hold steady · move outdoors for a fix" />
-      )}
-      {showError && (
-        <Overlay
-          title="GPS UNAVAILABLE"
-          subtitle={
-            gps.status === 'denied'
-              ? 'Permission denied · enable location to continue'
-              : gps.errorMessage ?? 'Could not acquire a position'
-          }
-          danger
-        />
-      )}
-    </div>
-  );
-}
-
-function Overlay({
-  title,
-  subtitle,
-  danger,
-}: {
-  title: string;
-  subtitle?: string;
-  danger?: boolean;
-}) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: 18,
-        right: 18,
-        bottom: 'calc(220px + max(0px, env(safe-area-inset-bottom)))',
-        padding: '14px 16px',
-        background: 'rgba(13,11,8,0.92)',
-        border: `1px solid ${danger ? PALETTE.late : 'rgba(212,200,168,0.25)'}`,
-        borderRadius: 2,
-        color: danger ? PALETTE.late : PALETTE.cream,
-        fontFamily: "'Barlow Condensed', sans-serif",
-        textAlign: 'center',
-        zIndex: 10,
-      }}
-    >
-      <div style={{ fontWeight: 600, fontSize: 14, letterSpacing: 3 }}>{title}</div>
-      {subtitle && (
-        <div style={{ marginTop: 4, fontSize: 12, color: PALETTE.creamDim, letterSpacing: 1 }}>
-          {subtitle}
-        </div>
-      )}
+      <BottomControls onReset={onReset} onExit={onExit} />
+      <GpsOverlays gps={gps} />
     </div>
   );
 }

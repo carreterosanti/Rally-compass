@@ -1,6 +1,6 @@
 import type { PanelDerived } from '../hooks/useStage';
 import { fmtDelta, fmtDist, statusText } from '../lib/format';
-import { PALETTE } from '../lib/palette';
+import { PALETTE, alpha } from '../lib/palette';
 import { Dial } from './Dial';
 import { LCD } from './LCD';
 import { PrintedLabel } from './PrintedLabel';
@@ -14,11 +14,15 @@ type Props = {
   tolerance: number;
   /** Compact size — for stacked dual view */
   compact?: boolean;
+  /** Plain text color for the delta — the screen background already shows the pace. */
+  neutral?: boolean;
+  /** Replaces the ON PACE / LATE / AHEAD status line. */
+  statusLabel?: string;
 };
 
 function statusColor(delta: number, tolerance: number): string {
   if (Math.abs(delta) < tolerance) return PALETTE.onpace;
-  return delta > 0 ? PALETTE.late : PALETTE.ahead;
+  return delta > 0 ? PALETTE.textLate : PALETTE.textAhead;
 }
 
 const DELTA_RANGE_S = 10;
@@ -30,6 +34,8 @@ export function DriverPanel({
   derived,
   tolerance,
   compact = false,
+  neutral = false,
+  statusLabel,
 }: Props) {
   if (compact) {
     return (
@@ -39,6 +45,8 @@ export function DriverPanel({
         tagColor={tagColor}
         derived={derived}
         tolerance={tolerance}
+        neutral={neutral}
+        statusLabel={statusLabel}
       />
     );
   }
@@ -63,10 +71,12 @@ function CompactPanel({
   tagColor,
   derived,
   tolerance,
+  neutral,
+  statusLabel,
 }: Omit<Props, 'compact'>) {
   const { delta, distanceM, currentSpeedKmh } = derived;
-  const sc = statusColor(delta, tolerance);
-  const status = statusText(delta, tolerance);
+  const sc = neutral ? PALETTE.cream : statusColor(delta, tolerance);
+  const status = statusLabel ?? statusText(delta, tolerance);
 
   // Needle position on horizontal scale, clamped to ±DELTA_RANGE_S
   const t = Math.max(-DELTA_RANGE_S, Math.min(DELTA_RANGE_S, delta));
@@ -104,7 +114,7 @@ function CompactPanel({
                 height: 8,
                 borderRadius: 1,
                 background: tagColor,
-                boxShadow: `0 0 6px ${tagColor}80`,
+                boxShadow: `0 0 6px ${alpha(tagColor, 50)}`,
               }}
             />
           )}
@@ -119,10 +129,10 @@ function CompactPanel({
           position: 'relative',
           marginTop: 8,
           height: 22,
-          background: 'linear-gradient(180deg, #181410 0%, #0c0a07 100%)',
-          border: '1px solid #2a2419',
+          background: `linear-gradient(180deg, ${PALETTE.trackBgTop} 0%, ${PALETTE.trackBgBottom} 100%)`,
+          border: `1px solid ${PALETTE.trackBorder}`,
           borderRadius: 2,
-          boxShadow: 'inset 0 1px 0 rgba(212,200,168,0.05)',
+          boxShadow: `inset 0 1px 0 ${PALETTE.lineFaint}`,
         }}
       >
         {/* caution band — center */}
@@ -213,7 +223,7 @@ function CompactPanel({
             color: sc,
             letterSpacing: -3,
             fontVariantNumeric: 'tabular-nums',
-            textShadow: `0 0 36px ${sc}55`,
+            textShadow: `0 0 36px ${alpha(sc, 33)}`,
           }}
         >
           {fmtDelta(delta)}
@@ -320,7 +330,7 @@ function FullPanel({
                 height: 8,
                 borderRadius: 1,
                 background: tagColor,
-                boxShadow: `0 0 6px ${tagColor}80`,
+                boxShadow: `0 0 6px ${alpha(tagColor, 50)}`,
               }}
             />
           )}
@@ -367,7 +377,7 @@ function FullPanel({
           color: sc,
           letterSpacing: -2,
           fontVariantNumeric: 'tabular-nums',
-          textShadow: `0 0 24px ${sc}33`,
+          textShadow: `0 0 24px ${alpha(sc, 20)}`,
         }}
       >
         {fmtDelta(delta)}

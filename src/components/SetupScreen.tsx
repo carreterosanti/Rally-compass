@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
-import { PALETTE } from '../lib/palette';
+import type { Role, Theme } from '../hooks/usePersistence';
+import { PALETTE, alpha } from '../lib/palette';
 import { Dial } from './Dial';
 import { StatusBar } from './StatusBar';
 
@@ -15,10 +16,12 @@ type Props = {
   setTargetKmh: (v: number) => void;
   tolerance: number;
   setTolerance: (v: number) => void;
-  audioAlerts: boolean;
-  setAudioAlerts: (v: boolean) => void;
-  vibrateAlerts: boolean;
-  setVibrateAlerts: (v: boolean) => void;
+  role: Role;
+  setRole: (v: Role) => void;
+  theme: Theme;
+  setTheme: (v: Theme) => void;
+  stageCount: number;
+  onOpenLog: () => void;
   onStart: () => void;
 };
 
@@ -26,7 +29,7 @@ const stepBtnStyle: CSSProperties = {
   width: 44,
   height: 44,
   background: 'transparent',
-  border: '1px solid rgba(212,200,168,0.25)',
+  border: `1px solid ${PALETTE.lineStrong}`,
   borderRadius: 22,
   color: PALETTE.cream,
   fontFamily: "'Barlow', sans-serif",
@@ -42,7 +45,7 @@ const presetBtnStyle: CSSProperties = {
   minWidth: 44,
   padding: '8px 12px',
   background: 'transparent',
-  border: '1px solid rgba(212,200,168,0.18)',
+  border: `1px solid ${PALETTE.line}`,
   borderRadius: 2,
   color: PALETTE.cream,
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -59,10 +62,12 @@ export function SetupScreen({
   setTargetKmh,
   tolerance,
   setTolerance,
-  audioAlerts,
-  setAudioAlerts,
-  vibrateAlerts,
-  setVibrateAlerts,
+  role,
+  setRole,
+  theme,
+  setTheme,
+  stageCount,
+  onOpenLog,
   onStart,
 }: Props) {
   const adjust = (d: number) => setTargetKmh(Math.max(10, Math.min(200, targetKmh + d)));
@@ -80,7 +85,7 @@ export function SetupScreen({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderBottom: '1px solid rgba(212,200,168,0.08)',
+          borderBottom: `1px solid ${PALETTE.lineFaint}`,
         }}
       >
         <div
@@ -94,6 +99,27 @@ export function SetupScreen({
         >
           RALLY COMPASS
         </div>
+        <button
+          onClick={onOpenLog}
+          style={{
+            position: 'absolute',
+            right: 14,
+            padding: '7px 10px',
+            background: 'transparent',
+            border: `1px solid ${PALETTE.line}`,
+            borderRadius: 2,
+            color: PALETTE.cream,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 600,
+            fontSize: 12,
+            letterSpacing: 2,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            touchAction: 'manipulation',
+          }}
+        >
+          REGISTRO{stageCount > 0 ? ` · ${stageCount}` : ''}
+        </button>
       </div>
 
       <div
@@ -242,7 +268,7 @@ export function SetupScreen({
                 background: v === targetKmh ? PALETTE.bezel : 'transparent',
                 color: v === targetKmh ? PALETTE.needle : PALETTE.cream,
                 borderColor:
-                  v === targetKmh ? PALETTE.needleEdge : 'rgba(212,200,168,0.18)',
+                  v === targetKmh ? PALETTE.needleEdge : PALETTE.line,
               }}
             >
               {v}
@@ -292,7 +318,7 @@ export function SetupScreen({
                 padding: '12px 0',
                 background: opt.v === tolerance ? PALETTE.bezel : 'transparent',
                 border: `1px solid ${
-                  opt.v === tolerance ? PALETTE.needleEdge : 'rgba(212,200,168,0.18)'
+                  opt.v === tolerance ? PALETTE.needleEdge : PALETTE.line
                 }`,
                 borderRadius: 2,
                 color: opt.v === tolerance ? PALETTE.needle : PALETTE.cream,
@@ -327,15 +353,21 @@ export function SetupScreen({
             marginTop: 14,
           }}
         >
-          <ToggleChip
-            active={audioAlerts}
-            onClick={() => setAudioAlerts(!audioAlerts)}
-            label="AUDIO ALERTS"
+          <Segmented
+            value={role}
+            onChange={setRole}
+            options={[
+              { v: 'driver', label: 'CONDUCTOR' },
+              { v: 'codriver', label: 'COPILOTO' },
+            ]}
           />
-          <ToggleChip
-            active={vibrateAlerts}
-            onClick={() => setVibrateAlerts(!vibrateAlerts)}
-            label="VIBRATE"
+          <Segmented
+            value={theme}
+            onChange={setTheme}
+            options={[
+              { v: 'dark', label: 'OSCURO' },
+              { v: 'light', label: 'CLARO' },
+            ]}
           />
         </div>
       </div>
@@ -346,7 +378,7 @@ export function SetupScreen({
           style={{
             width: '100%',
             height: 64,
-            background: 'linear-gradient(180deg, #2a1f0c 0%, #1a1408 100%)',
+            background: `linear-gradient(180deg, ${PALETTE.ctaTop} 0%, ${PALETTE.ctaBottom} 100%)`,
             border: `1.5px solid ${PALETTE.needleEdge}`,
             borderRadius: 2,
             color: PALETTE.needle,
@@ -356,8 +388,7 @@ export function SetupScreen({
             letterSpacing: 6,
             cursor: 'pointer',
             textTransform: 'uppercase',
-            boxShadow:
-              'inset 0 1px 0 rgba(245,198,58,0.15), 0 0 24px rgba(245,198,58,0.08)',
+            boxShadow: `inset 0 1px 0 ${alpha(PALETTE.needle, 15)}, 0 0 24px ${alpha(PALETTE.needle, 8)}`,
             WebkitTapHighlightColor: 'transparent',
             touchAction: 'manipulation',
           }}
@@ -369,35 +400,46 @@ export function SetupScreen({
   );
 }
 
-function ToggleChip({
-  active,
-  onClick,
-  label,
+function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
 }: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
+  value: T;
+  onChange: (v: T) => void;
+  options: ReadonlyArray<{ v: T; label: string }>;
 }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        flex: 1,
-        padding: '10px 0',
-        background: active ? PALETTE.bezel : 'transparent',
-        border: `1px solid ${active ? PALETTE.needleEdge : 'rgba(212,200,168,0.18)'}`,
-        borderRadius: 2,
-        color: active ? PALETTE.needle : PALETTE.creamDim,
-        fontFamily: "'Barlow Condensed', sans-serif",
-        fontWeight: 600,
-        fontSize: 12,
-        letterSpacing: 2,
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        touchAction: 'manipulation',
-      }}
-    >
-      {label} {active ? 'ON' : 'OFF'}
-    </button>
+    <div style={{ flex: 1, display: 'flex' }}>
+      {options.map((opt, i) => {
+        const active = opt.v === value;
+        return (
+          <button
+            key={opt.v}
+            onClick={() => onChange(opt.v)}
+            style={{
+              flex: 1,
+              padding: '10px 0',
+              background: active ? PALETTE.bezel : 'transparent',
+              position: 'relative',
+              zIndex: active ? 1 : 0,
+              marginLeft: i === 0 ? 0 : -1,
+              border: `1px solid ${active ? PALETTE.needleEdge : PALETTE.line}`,
+              borderRadius: 2,
+              color: active ? PALETTE.needle : PALETTE.creamDim,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: 1.5,
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
