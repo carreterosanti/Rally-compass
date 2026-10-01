@@ -1,20 +1,22 @@
 export const fmtDelta = (d: number): string => {
-  if (!Number.isFinite(d)) return '0.0';
+  if (!Number.isFinite(d)) return '0.00';
   const sign = d > 0 ? '+' : d < 0 ? '−' : '';
-  return sign + Math.abs(d).toFixed(1);
+  return sign + Math.abs(d).toFixed(2);
 };
 
 export const fmtDist = (m: number): string => (m / 1000).toFixed(2);
 
-/** Elapsed time with tenths: `mm:ss.d`, or `h:mm:ss.d` past one hour. */
+/** Elapsed time with hundredths: `mm:ss.cc`, or `h:mm:ss.cc` past one hour. */
 export const fmtTime = (s: number): string => {
-  if (!Number.isFinite(s) || s < 0) return '00:00.0';
-  const tenths = Math.round(s * 10);
-  const h = Math.floor(tenths / 36000);
-  const m = Math.floor((tenths % 36000) / 600);
-  const ss = Math.floor((tenths % 600) / 10);
-  const d = tenths % 10;
-  const mmss = `${m.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')}.${d}`;
+  if (!Number.isFinite(s) || s < 0) return '00:00.00';
+  const cs = Math.round(s * 100);
+  const h = Math.floor(cs / 360000);
+  const m = Math.floor((cs % 360000) / 6000);
+  const ss = Math.floor((cs % 6000) / 100);
+  const c = cs % 100;
+  const mmss = `${m.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')}.${c
+    .toString()
+    .padStart(2, '0')}`;
   return h > 0 ? `${h}:${mmss}` : mmss;
 };
 

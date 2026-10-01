@@ -91,9 +91,9 @@ export function useGPSTracking({ active }: Options) {
     setState(projectState(tracker.getState(), statusRef.current, errorRef.current, hasFirstFix.current));
   }, []);
 
+  // Zeroes the distances only: the GPS lock is still valid while the watch runs.
   const reset = useCallback(() => {
     trackerRef.current!.reset();
-    hasFirstFix.current = false;
     pausedRef.current = false;
     publish();
   }, [publish]);
@@ -114,6 +114,7 @@ export function useGPSTracking({ active }: Options) {
         navigator.geolocation.clearWatch(watchId.current);
         watchId.current = null;
       }
+      hasFirstFix.current = false;
       return;
     }
 
