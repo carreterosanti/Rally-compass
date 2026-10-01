@@ -146,10 +146,11 @@ describe('restoreLog', () => {
 });
 
 describe('fmtTime', () => {
-  it('formats with tenths', () => {
-    expect(fmtTime(0)).toBe('00:00.0');
-    expect(fmtTime(754.46)).toBe('12:34.5');
-    expect(fmtTime(59.96)).toBe('01:00.0');
-    expect(fmtTime(3725.3)).toBe('1:02:05.3');
+  it('formats with hundredths', () => {
+    expect(fmtTime(0)).toBe('00:00.00');
+    expect(fmtTime(10.53)).toBe('00:10.53');
+    expect(fmtTime(754.456)).toBe('12:34.46');
+    expect(fmtTime(59.996)).toBe('01:00.00');
+    expect(fmtTime(3725.3)).toBe('1:02:05.30');
   });
 });
