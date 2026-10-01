@@ -67,7 +67,7 @@ export function HoldButton({
           position: 'relative',
           overflow: 'hidden',
           flex: 1,
-          height: 56,
+          height: 'var(--btn-h)',
           background: 'transparent',
           border: `1px solid ${PALETTE.line}`,
           borderRadius: 2,

@@ -63,18 +63,8 @@ export function DrivingScreen({
         onToggleTheme={onToggleTheme}
       />
 
-      <div
-        style={{
-          position: 'absolute',
-          top: 100,
-          left: 0,
-          right: 0,
-          bottom: 'calc(96px + max(0px, env(safe-area-inset-bottom)))',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+      <div className="screen-body">
+        <div className="panel-slot">
           <DriverPanel
             label="RAW GPS"
             sublabel="UNFILTERED"
@@ -86,31 +76,17 @@ export function DrivingScreen({
           />
         </div>
 
-        <div
-          style={{
-            height: 1,
-            background: PALETTE.lineFaint,
-            margin: '0 18px',
-            position: 'relative',
-          }}
-        >
+        <div className="panel-divider" style={{ background: PALETTE.lineFaint }}>
           <span
             style={{
-              position: 'absolute',
-              left: '50%',
-              top: -10,
-              transform: 'translateX(-50%)',
-              padding: '2px 10px',
               background: showPace ? 'transparent' : PALETTE.panelBg,
               fontFamily: "'Barlow Condensed', sans-serif",
               fontSize: 10,
               letterSpacing: 2,
-              whiteSpace: 'nowrap',
               color: gps.divergenceAlert ? PALETTE.late : PALETTE.creamFaint,
             }}
           >
-            Δ {gps.divergencePercent.toFixed(1)}%
-            {' · '}
+            Δ {gps.divergencePercent.toFixed(1)}%{' · '}
             <span style={{ color: SIGNAL_COLORS[gps.signalQuality] }}>
               {SIGNAL_LABELS[gps.signalQuality]}
             </span>
@@ -125,7 +101,7 @@ export function DrivingScreen({
           </span>
         </div>
 
-        <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+        <div className="panel-slot">
           <DriverPanel
             label="KALMAN FUSED"
             sublabel="FILTERED + DR"
@@ -134,7 +110,7 @@ export function DrivingScreen({
             tolerance={tolerance}
             compact
             neutral={showPace}
-            statusLabel={showPace ? paceMessage(pace) ?? undefined : undefined}
+            statusLabel={showPace ? (paceMessage(pace) ?? undefined) : undefined}
           />
         </div>
       </div>

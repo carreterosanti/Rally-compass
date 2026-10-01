@@ -7,16 +7,7 @@ type Props = {
 
 export function BottomControls({ onReset, onExit }: Props) {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 'max(24px, env(safe-area-inset-bottom))',
-        left: 18,
-        right: 18,
-        display: 'flex',
-        gap: 10,
-      }}
-    >
+    <div className="screen-footer">
       <HoldButton
         danger
         onConfirm={onReset}
