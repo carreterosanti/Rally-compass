@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArmedScreen } from './components/ArmedScreen';
 import { CoDriverScreen } from './components/CoDriverScreen';
 import { DrivingScreen } from './components/DrivingScreen';
 import { LogScreen } from './components/LogScreen';
@@ -8,7 +9,7 @@ import { useRallyLog } from './hooks/useRallyLog';
 import { useStage } from './hooks/useStage';
 import { useTheme } from './hooks/useTheme';
 
-type Mode = 'setup' | 'driving' | 'log';
+type Mode = 'setup' | 'armed' | 'driving' | 'log';
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('setup');
@@ -32,9 +33,15 @@ export default function App() {
     rally.begin(settings.targetKmh, startedAt);
   };
 
-  const startStage = () => {
-    beginStage();
-    setMode('driving');
+  // START STAGE only arms: the clock starts with the tap on the armed screen.
+  const armStage = () => {
+    controller.arm();
+    setMode('armed');
+  };
+
+  const cancelArmed = () => {
+    controller.exit();
+    setMode('setup');
   };
 
   const exitToSetup = () => {
@@ -75,7 +82,22 @@ export default function App() {
         setTheme={setTheme}
         stageCount={rally.log.stages.length}
         onOpenLog={() => setMode('log')}
-        onStart={startStage}
+        onStart={armStage}
+      />
+    );
+  }
+
+  if (mode === 'armed') {
+    return (
+      <ArmedScreen
+        targetKmh={settings.targetKmh}
+        role={settings.role}
+        theme={settings.theme}
+        onToggleTheme={toggleTheme}
+        gps={gps}
+        onStart={beginStage}
+        onGo={() => setMode('driving')}
+        onCancel={cancelArmed}
       />
     );
   }

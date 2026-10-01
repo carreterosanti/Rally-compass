@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGPSTracking } from './useGPSTracking';
 
-type StageStatus = 'idle' | 'running';
+type StageStatus = 'idle' | 'armed' | 'running';
 
 export type PanelDerived = {
   distanceM: number;
@@ -20,6 +20,8 @@ export type StageDerived = {
 
 export type StageController = {
   status: StageStatus;
+  /** Wait for the real start: GPS warms up, the clock stays at zero. */
+  arm: () => void;
   /** Start (or restart) the stage clock. Returns the START epoch ms. */
   start: () => number;
   exit: () => void;
@@ -58,7 +60,7 @@ export function useStage(targetKmh: number) {
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
 
-  const gps = useGPSTracking({ active: status === 'running' });
+  const gps = useGPSTracking({ active: status !== 'idle' });
 
   useEffect(() => {
     if (status !== 'running') return;
@@ -70,6 +72,13 @@ export function useStage(targetKmh: number) {
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, [status]);
+
+  const arm = useCallback(() => {
+    startedAtRef.current = null;
+    setStartedAt(null);
+    gps.reset();
+    setStatus('armed');
+  }, [gps]);
 
   const start = useCallback(() => {
     const t = Date.now();
@@ -104,6 +113,7 @@ export function useStage(targetKmh: number) {
 
   const controller: StageController = {
     status,
+    arm,
     start,
     exit,
     elapsedNow,
