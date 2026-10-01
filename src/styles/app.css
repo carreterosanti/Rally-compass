@@ -150,6 +150,45 @@ button {
   font-family: inherit;
 }
 
+/* ── Layout scale ───────────────────────────────────────────────
+   Chrome (status bar, header, footer buttons) shrinks on short
+   viewports so the content in between keeps room to breathe. */
+:root {
+  --status-h: 38px;
+  --header-h: 56px;
+  --gutter: 18px;
+  --btn-h: 56px;
+  --cta-h: 64px;
+  --footer-gap: 16px;
+  --footer-pad: 24px;
+}
+
+@media (max-height: 700px) {
+  :root {
+    --status-h: 28px;
+    --header-h: 46px;
+    --btn-h: 48px;
+    --cta-h: 54px;
+    --footer-gap: 10px;
+    --footer-pad: 12px;
+  }
+}
+
+/* Phones in landscape: drop the fake status bar entirely. */
+@media (max-height: 480px) {
+  :root {
+    --status-h: 0px;
+    --header-h: 40px;
+    --btn-h: 44px;
+    --cta-h: 46px;
+    --footer-gap: 8px;
+    --footer-pad: 8px;
+  }
+  .status-bar {
+    display: none !important;
+  }
+}
+
 .app-root {
   width: 100%;
   height: 100%;
@@ -159,9 +198,173 @@ button {
   position: relative;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
   padding-top: env(safe-area-inset-top);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* In-flow sections must be positioned so they paint above the absolute
+   pace overlay. Overlays keep their inline `position: absolute/fixed`. */
+.app-root > * {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.screen-footer {
+  display: flex;
+  gap: 10px;
+  padding: var(--footer-gap) var(--gutter) max(var(--footer-pad), env(safe-area-inset-bottom));
+}
+
+.hide-short {
+  display: block;
+}
+
+@media (max-height: 700px) {
+  .hide-short {
+    display: none;
+  }
+}
+
+/* ── Setup ─────────────────────────────────────────────────────── */
+.setup-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+}
+
+.setup-main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.setup-options {
+  flex-shrink: 0;
+  margin-top: clamp(12px, 3dvh, 32px);
+  padding-bottom: 4px;
+}
+
+/* The dial slot takes whatever height is left; the dial fits inside it. */
+.setup-dial-slot {
+  flex: 1 1 0;
+  min-height: 110px;
+  width: 100%;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.setup-dial {
+  position: relative;
+  width: min(320px, 100cqw, calc((100cqh - 22px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+/* 300px dial inside a 320×180 window, shifted up 20px (as the original). */
+.setup-dial > svg {
+  position: absolute;
+  top: -11.11%;
+  left: 3.125%;
+  width: 93.75%;
+  height: auto;
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .setup-body {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 24px;
+  }
+  .setup-main {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .setup-options {
+    flex: 1 1 0;
+    align-self: center;
+    margin-top: 0;
+  }
+}
+
+/* ── Driving screens ───────────────────────────────────────────── */
+.screen-body {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each panel sizes its hero and LCDs from its own box (cq units). */
+.panel-slot {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+  container-type: size;
+}
+
+.panel-divider {
+  flex-shrink: 0;
+  height: 1px;
+  margin: 0 var(--gutter);
+  position: relative;
+}
+
+.panel-divider > span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.codriver-body {
+  gap: clamp(8px, 2dvh, 12px);
+  padding: 0 var(--gutter);
+}
+
+.codriver-info {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 2dvh, 12px);
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .screen-body {
+    flex-direction: row;
+  }
+  .panel-divider {
+    width: 1px;
+    height: auto;
+    margin: 12px 0;
+  }
+  .panel-divider > span {
+    writing-mode: vertical-rl;
+    padding: 10px 2px;
+  }
+  .codriver-body {
+    gap: 16px;
+  }
+  .codriver-info {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+  .codriver-body > button {
+    flex: 1 1 0;
+  }
 }
 
 

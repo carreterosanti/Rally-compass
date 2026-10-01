@@ -27,6 +27,10 @@ function statusColor(delta: number, tolerance: number): string {
 
 const DELTA_RANGE_S = 10;
 
+// Compact LCDs scale with the panel box so both panels fit on short screens.
+const COMPACT_LCD_HEIGHT = 'clamp(52px, 30cqh, 92px)';
+const COMPACT_LCD_FONT = 'clamp(24px, min(16cqh, 12.5cqw), 50px)';
+
 export function DriverPanel({
   label,
   sublabel,
@@ -218,7 +222,8 @@ function CompactPanel({
           style={{
             fontFamily: "'Barlow', sans-serif",
             fontWeight: 700,
-            fontSize: 'clamp(72px, 18vh, 132px)',
+            // Sized from the panel box (.panel-slot), not the viewport.
+            fontSize: 'clamp(40px, min(30cqh, 28cqw), 132px)',
             lineHeight: 0.95,
             color: sc,
             letterSpacing: -3,
@@ -242,7 +247,7 @@ function CompactPanel({
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
-            fontSize: 'clamp(20px, 3.5vh, 30px)',
+            fontSize: 'clamp(14px, 8cqh, 30px)',
             letterSpacing: 6,
             color: sc,
             marginTop: 4,
@@ -264,8 +269,8 @@ function CompactPanel({
         <LCD
           digits={fmtDist(distanceM)}
           width="100%"
-          height={92}
-          fontSize={50}
+          height={COMPACT_LCD_HEIGHT}
+          fontSize={COMPACT_LCD_FONT}
           label="DISTANCE"
           sublabel="KM"
           padX={12}
@@ -273,8 +278,8 @@ function CompactPanel({
         <LCD
           digits={currentSpeedKmh.toFixed(0)}
           width="100%"
-          height={92}
-          fontSize={50}
+          height={COMPACT_LCD_HEIGHT}
+          fontSize={COMPACT_LCD_FONT}
           label="SPEED"
           sublabel="KM/H"
           padX={12}

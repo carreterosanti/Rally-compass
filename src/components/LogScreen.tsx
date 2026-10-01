@@ -223,7 +223,7 @@ function StageDetail({
           disabled={sharing}
           style={{
             flex: 1,
-            height: 56,
+            height: 'var(--btn-h)',
             background: PALETTE.bezel,
             border: `1.5px solid ${PALETTE.needleEdge}`,
             borderRadius: 2,
@@ -248,7 +248,8 @@ function StageDetail({
             position: 'absolute',
             left: 18,
             right: 18,
-            bottom: 'calc(92px + max(0px, env(safe-area-inset-bottom)))',
+            bottom:
+              'calc(var(--btn-h) + var(--footer-gap) + max(var(--footer-pad), env(safe-area-inset-bottom)) + 8px)',
             fontSize: 12,
             color: PALETTE.late,
             textAlign: 'center',
@@ -277,11 +278,8 @@ function Frame({
       <StatusBar />
       <div
         style={{
-          position: 'absolute',
-          top: 38,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          flex: '1 1 0',
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -289,7 +287,7 @@ function Frame({
         <div
           style={{
             position: 'relative',
-            height: 56,
+            height: 'var(--header-h)',
             flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
@@ -326,15 +324,7 @@ function Frame({
 
 function BottomBar({ children }: { children: ReactNode }) {
   return (
-    <div
-      style={{
-        flexShrink: 0,
-        display: 'flex',
-        gap: 10,
-        padding: '12px 18px max(24px, env(safe-area-inset-bottom))',
-        borderTop: `1px solid ${PALETTE.lineFaint}`,
-      }}
-    >
+    <div className="screen-footer" style={{ borderTop: `1px solid ${PALETTE.lineFaint}` }}>
       {children}
     </div>
   );

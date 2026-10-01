@@ -13,11 +13,7 @@ export function TopBar({ targetSpeed, gpsBars, theme, onToggleTheme }: Props) {
   return (
     <div
       style={{
-        position: 'absolute',
-        top: 38,
-        left: 0,
-        right: 0,
-        height: 56,
+        height: 'var(--header-h)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

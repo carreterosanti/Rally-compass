@@ -15,12 +15,9 @@ export function StatusBar() {
 
   return (
     <div
+      className="status-bar"
       style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 38,
+        height: 'var(--status-h)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

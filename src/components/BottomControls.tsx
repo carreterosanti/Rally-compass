@@ -1,5 +1,8 @@
 import { HoldButton } from './HoldButton';
 
+// Short hold: quick to trigger mid-stage, the confirm dialog still guards it.
+const HOLD_MS = 600;
+
 type Props = {
   onReset: () => void;
   onExit: () => void;
@@ -7,17 +10,9 @@ type Props = {
 
 export function BottomControls({ onReset, onExit }: Props) {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 'max(24px, env(safe-area-inset-bottom))',
-        left: 18,
-        right: 18,
-        display: 'flex',
-        gap: 10,
-      }}
-    >
+    <div className="screen-footer">
       <HoldButton
+        holdMs={HOLD_MS}
         danger
         onConfirm={onReset}
         confirmTitle="¿Reiniciar tramo?"
@@ -27,6 +22,7 @@ export function BottomControls({ onReset, onExit }: Props) {
         ↺ Reset
       </HoldButton>
       <HoldButton
+        holdMs={HOLD_MS}
         onConfirm={onExit}
         confirmTitle="¿Salir del tramo?"
         confirmText="El tramo actual se guarda en el Registro y volvés a la configuración."

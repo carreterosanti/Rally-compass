@@ -3,8 +3,10 @@ import { PALETTE } from '../lib/palette';
 type Props = {
   digits: string;
   width: string | number;
-  height: number;
-  fontSize: number;
+  /** px or any CSS length (e.g. a clamp() in container units). */
+  height: number | string;
+  /** Digit size; labels scale from it. px or any CSS length. */
+  fontSize: number | string;
   label?: string;
   sublabel?: string;
   ghost?: boolean;
@@ -40,6 +42,7 @@ export function LCD({
         justifyContent: 'center',
         padding: `0 ${padX}px`,
         overflow: 'hidden',
+        fontSize,
         fontVariantNumeric: 'tabular-nums',
         boxSizing: 'border-box',
       }}
@@ -48,7 +51,7 @@ export function LCD({
         <div
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: fontSize * 0.32,
+            fontSize: '0.32em',
             color: PALETTE.creamDim,
             letterSpacing: 1.2,
             textTransform: 'uppercase',
@@ -64,7 +67,7 @@ export function LCD({
           width: '100%',
           textAlign: align,
           fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-          fontSize,
+          fontSize: '1em',
           fontWeight: 500,
           color: PALETTE.lcdDigit,
           letterSpacing: 1,
@@ -91,7 +94,7 @@ export function LCD({
         <div
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: fontSize * 0.3,
+            fontSize: '0.3em',
             color: PALETTE.creamDim,
             letterSpacing: 1.2,
             textTransform: 'uppercase',

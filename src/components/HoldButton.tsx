@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { PALETTE, alpha } from '../lib/palette';
 
-const HOLD_MS = 2000;
+const DEFAULT_HOLD_MS = 2000;
 
 type Props = {
   children: ReactNode;
@@ -12,11 +12,13 @@ type Props = {
   onConfirm: () => void;
   danger?: boolean;
   disabled?: boolean;
+  /** How long the button must be held before the dialog opens. */
+  holdMs?: number;
   style?: CSSProperties;
 };
 
 /**
- * Destructive action guard: press and hold for 2 s (a bar fills up), then
+ * Destructive action guard: press and hold (a bar fills up), then
  * confirm in a dialog. Hard to trigger by accident in a bouncing car.
  */
 export function HoldButton({
@@ -27,6 +29,7 @@ export function HoldButton({
   onConfirm,
   danger,
   disabled,
+  holdMs = DEFAULT_HOLD_MS,
   style,
 }: Props) {
   const [holding, setHolding] = useState(false);
@@ -49,7 +52,7 @@ export function HoldButton({
       timer.current = null;
       setHolding(false);
       setConfirming(true);
-    }, HOLD_MS);
+    }, holdMs);
   };
 
   const color = danger ? PALETTE.late : PALETTE.cream;
@@ -67,7 +70,7 @@ export function HoldButton({
           position: 'relative',
           overflow: 'hidden',
           flex: 1,
-          height: 56,
+          height: 'var(--btn-h)',
           background: 'transparent',
           border: `1px solid ${PALETTE.line}`,
           borderRadius: 2,
@@ -94,7 +97,7 @@ export function HoldButton({
             bottom: 0,
             width: holding ? '100%' : '0%',
             background: alpha(color, 25),
-            transition: holding ? `width ${HOLD_MS}ms linear` : 'none',
+            transition: holding ? `width ${holdMs}ms linear` : 'none',
           }}
         />
         <span style={{ position: 'relative' }}>{children}</span>
@@ -108,7 +111,7 @@ export function HoldButton({
             marginTop: 1,
           }}
         >
-          {holding ? 'mantené…' : 'mantener 2 s'}
+          {holding ? 'mantené…' : `mantener ${(holdMs / 1000).toLocaleString('es')} s`}
         </span>
       </button>
 

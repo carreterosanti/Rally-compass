@@ -66,101 +66,92 @@ export function CoDriverScreen({
         onToggleTheme={onToggleTheme}
       />
 
-      <div
-        style={{
-          position: 'absolute',
-          top: 100,
-          left: 18,
-          right: 18,
-          bottom: 'calc(96px + max(0px, env(safe-area-inset-bottom)))',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-        }}
-      >
-        {/* Current deviation (fused) */}
-        <div style={{ textAlign: 'center', paddingTop: 6 }}>
-          <div
-            style={{
-              fontFamily: "'Barlow', sans-serif",
-              fontWeight: 700,
-              fontSize: 'clamp(56px, 11vh, 88px)',
-              lineHeight: 1,
-              color: dc,
-              letterSpacing: -2,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {fmtDelta(delta)}
-            <span style={{ fontSize: '0.35em', color: PALETTE.creamDim, marginLeft: 4 }}>s</span>
+      <div className="screen-body codriver-body">
+        <div className="codriver-info">
+          {/* Current deviation (fused) */}
+          <div style={{ textAlign: 'center', paddingTop: 6 }}>
+            <div
+              style={{
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 700,
+                fontSize: 'clamp(44px, 11dvh, 88px)',
+                lineHeight: 1,
+                color: dc,
+                letterSpacing: -2,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtDelta(delta)}
+              <span style={{ fontSize: '0.35em', color: PALETTE.creamDim, marginLeft: 4 }}>s</span>
+            </div>
+            <div
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: 18,
+                letterSpacing: 5,
+                color: dc,
+                marginTop: 2,
+              }}
+            >
+              {statusText(delta, tolerance)}
+            </div>
+            <div
+              style={{
+                marginTop: 8,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 16,
+                color: PALETTE.cream,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtTime(derived.elapsedSec)}
+              <span style={{ color: PALETTE.creamFaint }}> · </span>
+              {fmtDist(distanceM)} km
+            </div>
           </div>
-          <div
-            style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 700,
-              fontSize: 18,
-              letterSpacing: 5,
-              color: dc,
-              marginTop: 2,
-            }}
-          >
-            {statusText(delta, tolerance)}
-          </div>
-          <div
-            style={{
-              marginTop: 8,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 16,
-              color: PALETTE.cream,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {fmtTime(derived.elapsedSec)}
-            <span style={{ color: PALETTE.creamFaint }}> · </span>
-            {fmtDist(distanceM)} km
-          </div>
-        </div>
 
-        {/* Last checkpoint — confirms the mark was recorded */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            padding: '10px 14px',
-            border: `1px solid ${PALETTE.line}`,
-            borderRadius: 2,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            color: PALETTE.creamDim,
-            fontSize: 14,
-            letterSpacing: 1.5,
-          }}
-        >
-          {last ? (
-            <>
-              <span>
-                <span style={{ color: PALETTE.cream, fontWeight: 700, fontSize: 18 }}>
-                  CP {last.n}
+          {/* Last checkpoint — confirms the mark was recorded */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              padding: '10px 14px',
+              border: `1px solid ${PALETTE.line}`,
+              borderRadius: 2,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              color: PALETTE.creamDim,
+              fontSize: 14,
+              letterSpacing: 1.5,
+            }}
+          >
+            {last ? (
+              <>
+                <span>
+                  <span style={{ color: PALETTE.cream, fontWeight: 700, fontSize: 18 }}>
+                    CP {last.n}
+                  </span>
+                  {'  '}
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {fmtTime(last.elapsedSec)}
+                  </span>
                 </span>
-                {'  '}
-                <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  {fmtTime(last.elapsedSec)}
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 700,
+                    fontSize: 20,
+                    color: deltaColor(last.fused.diffSec, tolerance),
+                  }}
+                >
+                  {fmtDelta(last.fused.diffSec)} s
                 </span>
-              </span>
-              <span
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontWeight: 700,
-                  fontSize: 20,
-                  color: deltaColor(last.fused.diffSec, tolerance),
-                }}
-              >
-                {fmtDelta(last.fused.diffSec)} s
-              </span>
-            </>
-          ) : (
-            <span>SIN CHECKPOINTS TODAVÍA</span>
-          )}
+              </>
+            ) : (
+              <span>SIN CHECKPOINTS TODAVÍA</span>
+            )}
+          </div>
         </div>
 
         {/* MARCAR CP */}
@@ -171,7 +162,7 @@ export function CoDriverScreen({
             position: 'relative',
             overflow: 'hidden',
             flex: 1,
-            minHeight: 120,
+            minHeight: 'clamp(88px, 22dvh, 120px)',
             background: `linear-gradient(180deg, ${PALETTE.ctaTop} 0%, ${PALETTE.ctaBottom} 100%)`,
             border: `2px solid ${PALETTE.needleEdge}`,
             borderRadius: 4,
@@ -192,7 +183,15 @@ export function CoDriverScreen({
               style={{ position: 'absolute', inset: 0, background: PALETTE.needle }}
             />
           )}
-          <span style={{ position: 'relative', display: 'block', fontWeight: 700, fontSize: 'clamp(40px, 8vh, 64px)', letterSpacing: 6 }}>
+          <span
+            style={{
+              position: 'relative',
+              display: 'block',
+              fontWeight: 700,
+              fontSize: 'clamp(40px, 8vh, 64px)',
+              letterSpacing: 6,
+            }}
+          >
             MARCAR CP
           </span>
           <span
