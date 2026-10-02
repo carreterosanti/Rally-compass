@@ -120,7 +120,7 @@ function StageDetail({
     }
   };
 
-  const col = { cp: 34, km: 62, time: 84, dif: 64 };
+  const col = { cp: 34, km: 68, time: 84, dif: 64 };
 
   return (
     <Frame title="TRAMO" backLabel="‹ Tramos" onBack={onBack}>

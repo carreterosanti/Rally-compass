@@ -4,7 +4,8 @@ export const fmtDelta = (d: number): string => {
   return sign + Math.abs(d).toFixed(2);
 };
 
-export const fmtDist = (m: number): string => (m / 1000).toFixed(2);
+/** Kilometres with metre resolution: `12.345`. */
+export const fmtDist = (m: number): string => (m / 1000).toFixed(3);
 
 /** Elapsed time with hundredths: `mm:ss.cc`, or `h:mm:ss.cc` past one hour. */
 export const fmtTime = (s: number): string => {
