@@ -61,34 +61,38 @@ export function LCD({
           {label}
         </div>
       )}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          textAlign: align,
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-          fontSize: '1em',
-          fontWeight: 500,
-          color: PALETTE.lcdDigit,
-          letterSpacing: 1,
-          lineHeight: 1,
-          textShadow: `0 0 6px ${PALETTE.lcdDigitDim}`,
-        }}
-      >
-        {ghost && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              color: PALETTE.lcdDigitDim,
-              pointerEvents: 'none',
-            }}
-          >
-            {'8'.repeat(txt.length)}
-          </div>
-        )}
-        <div style={{ position: 'relative' }}>{txt}</div>
+      {/* Digits shrink when a long readout (e.g. `123.456`) would clip:
+          each monospace glyph is ~0.6em wide plus 1px letter-spacing. */}
+      <div style={{ width: '100%', containerType: 'inline-size' }}>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            textAlign: align,
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+            fontSize: `min(1em, calc((100cqw - ${txt.length}px) / ${(txt.length * 0.62).toFixed(2)}))`,
+            fontWeight: 500,
+            color: PALETTE.lcdDigit,
+            letterSpacing: 1,
+            lineHeight: 1,
+            textShadow: `0 0 6px ${PALETTE.lcdDigitDim}`,
+          }}
+        >
+          {ghost && (
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                color: PALETTE.lcdDigitDim,
+                pointerEvents: 'none',
+              }}
+            >
+              {'8'.repeat(txt.length)}
+            </div>
+          )}
+          <div style={{ position: 'relative' }}>{txt}</div>
+        </div>
       </div>
       {sublabel && (
         <div
